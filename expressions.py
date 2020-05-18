@@ -40,7 +40,8 @@ def parse_node(graph, expression, node, parent_id=None, edge_label='', color='wh
 	shape = ''
 	invert = False
 	expression_parent_id = parent_id
-	node_style = 'filled'
+	ast_node_style = 'filled'
+	expression_node_style = 'filled'
 
 	# Add any attributes to the node label (e.g. name, op, type, etc.)
 	for attr in node.attr_names:
@@ -59,32 +60,36 @@ def parse_node(graph, expression, node, parent_id=None, edge_label='', color='wh
 			expression_parent_id = None
 			add_order(node_id)
 			e = e.subgraph(name='cluster' + node_id)
-			node_style += ',bold'
+			expression_node_style += ',bold'
 		expression_label = node.op
 	elif isinstance(node, c_ast.UnaryOp):
 		# Colour unary operator in green, and create new expression around it if increment or decrement
 		color = 'green'
-		subgraph = graph.subgraph(name='cluster' + node_id)
 		if node.op in ('++', 'p++', '--', 'p--'):
+			subgraph = graph.subgraph(name='cluster' + node_id)
 			if e is None:
 				e = expressions
 				expression_parent_id = None
 				add_order(node_id)
 				e = e.subgraph(name='cluster' + node_id)
-				node_style += ',bold'
+				expression_node_style += ',bold'
 				expression_label = node.op
+		else:
+			subgraph = graph.subgraph(name='cluster' + node_id, style="dashed")
 	elif isinstance(node, c_ast.Decl):
 		# Colour declaration in green, and create new expression around it if an initialiser
 		color = 'green'
-		subgraph = graph.subgraph(name='cluster' + node_id)
 		if node.init is not None:
+			subgraph = graph.subgraph(name='cluster' + node_id)
 			if e is None:
 				e = expressions
 				expression_parent_id = None
 				add_order(node_id)
 				e = e.subgraph(name='cluster' + node_id)
-				node_style += ',bold'
+				expression_node_style += ',bold'
 				expression_label = '='
+		else:
+			subgraph = graph.subgraph(name='cluster' + node_id, style="dashed")
 	elif isinstance(node, c_ast.Return):
 		# Colour return in red, and create new expression around it
 		color = 'red'
@@ -94,7 +99,7 @@ def parse_node(graph, expression, node, parent_id=None, edge_label='', color='wh
 			expression_parent_id = None
 			add_order(node_id)
 			e = e.subgraph(name='cluster' + node_id)
-			node_style += ',bold'
+			expression_node_style += ',bold'
 		shape = 'square'
 		expression_label = '\\<ret\\>'
 	elif isinstance(node, c_ast.BinaryOp):
@@ -128,14 +133,16 @@ def parse_node(graph, expression, node, parent_id=None, edge_label='', color='wh
 	# If parsing a node that is part of an expression, add it to the current expression subgraph
 	if e is not None:
 		add_node(e, node_id, expression_label, expression_parent_id, '', color, invert=invert, shape=shape,
-		         direction='back', style=node_style)
+		         direction='back', style=expression_node_style)
+	else:
+		ast_node_style += ',dashed'
 
 	# Recursively parse the children of this node
 	for child in node.children():
 		parse_node(subgraph, e, child[1], node_id, child[0], color)
 
-	# Add this node to the current graph
-	add_node(graph, node_id, node_label, parent_id, edge_label, color)
+	# Add this node to the AST graph (or subgraph)
+	add_node(graph, node_id, node_label, parent_id, edge_label, color, style=ast_node_style)
 
 
 parser = argparse.ArgumentParser(description='Extract expressions from C source.')
