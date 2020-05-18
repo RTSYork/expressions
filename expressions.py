@@ -42,6 +42,7 @@ def parse_node(graph, expression, node, parent_id=None, edge_label='', color='wh
 	expression_parent_id = parent_id
 	ast_node_style = 'filled'
 	expression_node_style = 'filled'
+	coordinate = str(node.coord).split('/')[-1]
 
 	# Add any attributes to the node label (e.g. name, op, type, etc.)
 	for attr in node.attr_names:
@@ -54,51 +55,51 @@ def parse_node(graph, expression, node, parent_id=None, edge_label='', color='wh
 	if isinstance(node, c_ast.Assignment):
 		# Colour assigment in green, and create expression around it
 		color = 'green'
-		subgraph = graph.subgraph(name='cluster' + node_id)
+		subgraph = graph.subgraph(name='cluster' + node_id, label=coordinate)
 		if e is None:
 			e = expressions
 			expression_parent_id = None
 			add_order(node_id)
-			e = e.subgraph(name='cluster' + node_id)
+			e = e.subgraph(name='cluster' + node_id, label=coordinate)
 			expression_node_style += ',bold'
 		expression_label = node.op
 	elif isinstance(node, c_ast.UnaryOp):
 		# Colour unary operator in green, and create new expression around it if increment or decrement
 		color = 'green'
 		if node.op in ('++', 'p++', '--', 'p--'):
-			subgraph = graph.subgraph(name='cluster' + node_id)
+			subgraph = graph.subgraph(name='cluster' + node_id, label=coordinate)
 			if e is None:
 				e = expressions
 				expression_parent_id = None
 				add_order(node_id)
-				e = e.subgraph(name='cluster' + node_id)
+				e = e.subgraph(name='cluster' + node_id, label=coordinate)
 				expression_node_style += ',bold'
 				expression_label = node.op
 		else:
-			subgraph = graph.subgraph(name='cluster' + node_id, style="dashed")
+			subgraph = graph.subgraph(name='cluster' + node_id, style="dashed", label=coordinate)
 	elif isinstance(node, c_ast.Decl):
 		# Colour declaration in green, and create new expression around it if an initialiser
 		color = 'green'
 		if node.init is not None:
-			subgraph = graph.subgraph(name='cluster' + node_id)
+			subgraph = graph.subgraph(name='cluster' + node_id, label=coordinate)
 			if e is None:
 				e = expressions
 				expression_parent_id = None
 				add_order(node_id)
-				e = e.subgraph(name='cluster' + node_id)
+				e = e.subgraph(name='cluster' + node_id, label=coordinate)
 				expression_node_style += ',bold'
 				expression_label = '='
 		else:
-			subgraph = graph.subgraph(name='cluster' + node_id, style="dashed")
+			subgraph = graph.subgraph(name='cluster' + node_id, style="dashed", label=coordinate)
 	elif isinstance(node, c_ast.Return):
 		# Colour return in red, and create new expression around it
 		color = 'red'
-		subgraph = graph.subgraph(name='cluster' + node_id)
+		subgraph = graph.subgraph(name='cluster' + node_id, label=coordinate)
 		if e is None:
 			e = expressions
 			expression_parent_id = None
 			add_order(node_id)
-			e = e.subgraph(name='cluster' + node_id)
+			e = e.subgraph(name='cluster' + node_id, label=coordinate)
 			expression_node_style += ',bold'
 		shape = 'square'
 		expression_label = '\\<ret\\>'
