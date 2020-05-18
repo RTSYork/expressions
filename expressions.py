@@ -23,7 +23,7 @@ def add_node(graph, node_id, node_label, parent_id=None, edge_label='', color=''
 
 def add_order(node_id):
 	global order_id
-	ordering.add_edge(order_id, node_id, style='invisible')
+	ordering.add_edge(order_id, node_id, style='invis')
 	order_id = node_id
 
 
@@ -163,9 +163,9 @@ ast_graph = pgv.AGraph()
 expressions = pgv.AGraph(newrank='true')
 
 # Set up vertical alignment and deterministic left-right ordering of source file statements
-expressions.add_node('rank1', label='', style='invisible', width=0)
-expressions.add_node('rank2', label='', style='invisible', width=0)
-expressions.add_edge('rank1', 'rank2', style='invisible')
+expressions.add_node('rank1', label='', style='invis', width=0)
+expressions.add_node('rank2', label='', style='invis', width=0)
+expressions.add_edge('rank1', 'rank2', style='invis')
 ordering = expressions.subgraph(rank='same', rankdir='LR')
 order_id = 'rank2'
 
@@ -174,8 +174,8 @@ counter = 0
 parse_node(ast_graph, None, ast)
 
 # Add final node on right-hand-side to complete left-right ordering
-expressions.add_node('end', label='', style='invisible', width=0)
-ordering.add_edge(order_id, 'end', style='invisible')
+expressions.add_node('end', label='', style='invis', width=0)
+ordering.add_edge(order_id, 'end', style='invis')
 
 if ast_output is not None:
 	if verbosity > 0:
