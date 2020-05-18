@@ -149,12 +149,16 @@ parser = argparse.ArgumentParser(description='Extract expressions from C source.
 parser.add_argument('source_file')
 parser.add_argument('-t', '--ast', metavar='output_file', help='output AST graph to this file')
 parser.add_argument('-e', '--expressions', metavar='output_file', help='output expression graphs to this file')
+parser.add_argument('-p', '--png', action='store_true', default=0, help='output PNG file')
+parser.add_argument('-d', '--dot', action='store_true', default=0, help='output DOT file')
 parser.add_argument('-v', '--verbose', action='count', default=0, help='verbose output')
 args = parser.parse_args()
 
 source_filename = args.source_file
 ast_output = args.ast
 expressions_output = args.expressions
+output_png = args.png
+output_dot = args.dot
 verbosity = args.verbose
 
 if verbosity > 0:
@@ -185,18 +189,26 @@ expressions.add_node('end', label='', style='invis', width=0)
 ordering.add_edge(order_id, 'end', style='invis')
 
 if ast_output is not None:
-	if verbosity > 0:
-		print(f"Outputting AST graph to '{ast_output}.dot' and '{ast_output}.png'...")
 	ast_graph.layout('dot')
-	ast_graph.write(ast_output + '.dot')
-	ast_graph.draw(ast_output + '.png')
+	if output_dot:
+		if verbosity > 0:
+			print(f"Outputting AST graph to '{ast_output}.dot'...")
+		ast_graph.write(ast_output + '.dot')
+	if output_png:
+		if verbosity > 0:
+			print(f"Outputting AST graph to '{ast_output}.png'...")
+		ast_graph.draw(ast_output + '.png')
 
 if expressions_output is not None:
-	if verbosity > 0:
-		print(f"Outputting expression graphs to '{expressions_output}.dot' and '{expressions_output}.png'...")
 	expressions.layout('dot')
-	expressions.write(expressions_output + '.dot')
-	expressions.draw(expressions_output + '.png')
+	if output_dot:
+		if verbosity > 0:
+			print(f"Outputting expression graphs to '{expressions_output}.dot'...")
+		expressions.write(expressions_output + '.dot')
+	if output_png:
+		if verbosity > 0:
+			print(f"Outputting expression graphs to '{expressions_output}.png'...")
+		expressions.draw(expressions_output + '.png')
 
 if verbosity > 0:
 	print('Done.')
