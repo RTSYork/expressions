@@ -148,14 +148,20 @@ def parse_node(graph, expression, node, parent_id=None, edge_label='', color='wh
 
 parser = argparse.ArgumentParser(description='Extract expressions from C source.')
 parser.add_argument('source_file')
+parser.add_argument('-c', '--cpp', metavar='cpp_path', type=str, default='cpp',
+                    help="path to C preprocessor executable (default 'cpp')")
+parser.add_argument('-a', '--cppargs', metavar='cpp_args', type=str, default='',
+                    help="additional C preprocessor arguments (default none)")
 parser.add_argument('-t', '--ast', metavar='output_file', help='output AST graph to this file')
 parser.add_argument('-e', '--expressions', metavar='output_file', help='output expression graphs to this file')
-parser.add_argument('-p', '--png', action='store_true', default=0, help='output PNG file')
-parser.add_argument('-d', '--dot', action='store_true', default=0, help='output DOT file')
+parser.add_argument('-p', '--png', action='store_true', help='output PNG file')
+parser.add_argument('-d', '--dot', action='store_true', help='output DOT file')
 parser.add_argument('-v', '--verbose', action='count', default=0, help='verbose output')
 args = parser.parse_args()
 
 source_filename = args.source_file
+cpp_path = args.cpp
+cpp_args = args.cppargs
 ast_output = args.ast
 expressions_output = args.expressions
 output_png = args.png
@@ -165,7 +171,7 @@ verbosity = args.verbose
 if verbosity > 0:
 	print(f"Parsing file '{source_filename}'...")
 
-ast = pycparser.parse_file(source_filename, use_cpp=True)
+ast = pycparser.parse_file(source_filename, use_cpp=True, cpp_path=cpp_path, cpp_args=cpp_args)
 
 if verbosity > 0:
 	print(f"Constructing graphs...")
